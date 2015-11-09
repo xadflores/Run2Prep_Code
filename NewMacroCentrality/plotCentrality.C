@@ -1,31 +1,8 @@
-#include <TFile.h>
-#include <TTree.h>
-#include <TChain.h>
-#include <TCanvas.h>
-#include <TLegend.h>
-#include <TH1D.h>
-#include <TH2D.h>
-#include <TLatex.h>
-#include <TGraph.h>
-#include <TString.h>
-#include <stdio.h>
-#include <TLegendEntry.h>
-#include <TGraphAsymmErrors.h>
-#include <TF1.h>
-#include <TProfile.h>
-
-
-#include <vector>
-//#include <TMap.h>
-#include <map>
+#include "centralityCommon.h"
 
 using namespace std;
 
-const int NBINSCentrality=6;
-const int limit[5]={10,20,60,100,140};
-
-
-void plotCentrality(TString l1_input, bool isdata=false)
+void plotCentrality(TString l1_input)
 {
 
 	TFile *lFile = TFile::Open(Form("%s_CentralityCalibration.root",l1_input.Data()));
@@ -43,6 +20,8 @@ void plotCentrality(TString l1_input, bool isdata=false)
 	TH1D *hcorrl1EtsumPlusVscorrl1EtsumMinusNoEvSel= (TH1D*)lFile->Get("hcorrl1EtsumPlusVscorrl1EtsumMinusNoEvSel");
 
 	TH1D *hOffline[NBINSCentrality];
+	ofstream out_data(Form("%s_output.txt",l1_input.Data()));
+
 
 	for(int i = 0; i < NBINSCentrality; ++i){
 		hOffline[i]=(TH1D*)lFile->Get(Form("hOffline_Bin%d",i)); 
@@ -188,8 +167,9 @@ void plotCentrality(TString l1_input, bool isdata=false)
 	TCanvas *canvasranges=new TCanvas("canvasranges","canvasranges",600,500);
 	canvasranges->cd();
 
-	hOffline[0]->SetMaximum(300);
+	hOffline[0]->SetMaximum(3000);
 	hOffline[0]->GetXaxis()->SetRangeUser(-10,210.);
+	//hOffline[0]->GetYaxis()->SetRangeUser(0,100.);
 	hOffline[0]->GetYaxis()->SetTitleOffset(1.5);
 
 	for(int j=0;j<NBINSCentrality;j++){
@@ -205,38 +185,56 @@ void plotCentrality(TString l1_input, bool isdata=false)
 
 	}
 
+	double newReslimit[10];
+        for(int k=0; k<10;k++){
+		if ( k==0 || (k%2)==0){
+			newReslimit[k]=limit[k]+deltaC[k];}
+		else {newReslimit[k]=limit[k]-deltaC[k];}
+	}
+
+
 	TLegend *leg = new TLegend(0.340604,0.5940803,0.8741611,0.8816068,"L1 centrality threshold");
 	leg->SetFillColor(0);
 	leg->SetTextFont(42);
 	leg->SetTextSizePixels(20);
+         
 
-
-	leg->AddEntry(hOffline[0],Form("0  < L1cen < %d",limit[0]),"lp");
-	leg->AddEntry(hOffline[1],Form("%d < L1cen < %d",limit[0],limit[1]),"lp");
-	leg->AddEntry(hOffline[2],Form("%d < L1cen < %d",limit[1],limit[2]),"lp");
-	leg->AddEntry(hOffline[3],Form("%d < L1cen < %d",limit[2],limit[3]),"lp");
-	leg->AddEntry(hOffline[4],Form("%d< L1cen < %d", limit[3],limit[4]),"lp");
-	leg->AddEntry(hOffline[5],Form("%d< L1cen < 200",limit[4]),"lp");
+	leg->AddEntry(hOffline[0],Form("0  < L1cen < %f",newReslimit[0]),"lp");
+	leg->AddEntry(hOffline[1],Form("%f < L1cen < %f",newReslimit[1],newReslimit[2]),"lp");
+	leg->AddEntry(hOffline[2],Form("%f < L1cen < %f",newReslimit[3],newReslimit[4]),"lp");
+	leg->AddEntry(hOffline[3],Form("%f < L1cen < %f",newReslimit[5],newReslimit[6]),"lp");
+	leg->AddEntry(hOffline[4],Form("%f< L1cen < %f", newReslimit[7],newReslimit[8]),"lp");
+	leg->AddEntry(hOffline[5],Form("%f< L1cen < 200",newReslimit[9]),"lp");
 	leg->Draw();  
 
-	double Etsum[NBINSCentrality];
+	double Etsum[10];
+	double EtsumOrig[10];
+	for (int m=0;m<10;m++){
 
-	for (int m=0;m<NBINSCentrality-1;m++){
-
-		Etsum[m]=fprofileofflinel1EtsumVsCentrality_Calibration->Eval(limit[m]);
+		Etsum[m]=fprofileofflinel1EtsumVsCentrality_Calibration->Eval(newReslimit[m]);
+		EtsumOrig[m]=fprofileofflinel1EtsumVsCentrality_Calibration->Eval(limit[m]);
 	}
 
-	cout<<"***************************"<<endl;
-	cout<<"LUT for centrality ranges"<<endl;
-	cout<<"Centrality 0-5% = E_{T} sum > "<<Etsum[0]<<endl;
-	cout<<"Centrality 5-10% ="<<Etsum[1]<<"<E_{T} sum <"<<Etsum[0]<<endl;
-	cout<<"Centrality 10-30% ="<<Etsum[2]<<"<E_{T} sum <"<<Etsum[1]<<endl;
-	cout<<"Centrality 30-50% ="<<Etsum[3]<<"<E_{T} sum <"<<Etsum[2]<<endl;
-	cout<<"Centrality 50-90% ="<<Etsum[4]<<"<E_{T} sum <"<<Etsum[3]<<endl;
-	cout<<"Centrality "<<(int)(limit[4]/2)<<"-100% =  E_{T} sum <"<<Etsum[4]<<endl;
+	out_data<<"***************************"<<endl;
+	out_data<<"LUT for offline centrality ranges with OVERLAPS"<<endl;
+	out_data<<"centrality 0-"<<(int)(newReslimit[0])<<" = E_{t} sum > "<<Etsum[0]<<endl;
+	out_data<<"centrality "<<(int)(newReslimit[1])<<"-"<<(int)(newReslimit[2])<<" ="<<Etsum[2]<<"<E_{t} sum <"<<Etsum[1]<<endl;
+	out_data<<"centrality "<<(int)(newReslimit[3])<<"-"<<(int)(newReslimit[4])<<" ="<<Etsum[4]<<"<E_{t} sum <"<<Etsum[3]<<endl;
+	out_data<<"centrality "<<(int)(newReslimit[5])<<"-"<<(int)(newReslimit[6])<<" ="<<Etsum[6]<<"<E_{t} sum <"<<Etsum[5]<<endl;
+	out_data<<"centrality "<<(int)(newReslimit[7])<<"-"<<(int)(newReslimit[8])<<" ="<<Etsum[8]<<"<E_{t} sum <"<<Etsum[7]<<endl;
+	out_data<<"centrality "<<(int)(newReslimit[9])<<"-200 = E_{t} sum <"<<Etsum[9]<<endl;
 
+	out_data<<"***************************"<<endl;
+	out_data<<"LUT for offline centrality ranges with ORIGINAL"<<endl;
+	out_data<<"centrality 0-"<<(int)(limit[0])<<" = E_{t} sum > "<<EtsumOrig[0]<<endl;
+	out_data<<"centrality "<<(int)(limit[1])<<"-"<<(int)(limit[2])<<" ="<<EtsumOrig[2]<<"<E_{t} sum <"<<EtsumOrig[1]<<endl;
+	out_data<<"centrality "<<(int)(limit[3])<<"-"<<(int)(limit[4])<<" ="<<EtsumOrig[4]<<"<E_{t} sum <"<<EtsumOrig[3]<<endl;
+	out_data<<"centrality "<<(int)(limit[5])<<"-"<<(int)(limit[6])<<" ="<<EtsumOrig[6]<<"<E_{t} sum <"<<EtsumOrig[5]<<endl;
+	out_data<<"centrality "<<(int)(limit[7])<<"-"<<(int)(limit[8])<<" ="<<EtsumOrig[8]<<"<E_{t} sum <"<<EtsumOrig[7]<<endl;
+	out_data<<"centrality "<<(int)(limit[9])<<"-200 =  E_{t} sum <"<<EtsumOrig[9]<<endl;
 
-	if(!isdata){
+	//cout<<isMC<<endl;
+	if(isMC){
 
 		TH1D *hNcoll[NBINSCentrality];
 
@@ -270,15 +268,18 @@ void plotCentrality(TString l1_input, bool isdata=false)
 		leg->SetTextFont(42);
 		leg->SetTextSizePixels(20);
 
-		leg->AddEntry(hNcoll[0],Form("0  < L1cen < %d",limit[0]),"lp");
-		leg->AddEntry(hNcoll[1],Form("%d < L1cen < %d",limit[0],limit[1]),"lp");
-		leg->AddEntry(hNcoll[2],Form("%d < L1cen < %d",limit[1],limit[2]),"lp");
-		leg->AddEntry(hNcoll[3],Form("%d < L1cen < %d",limit[2],limit[3]),"lp");
-		leg->AddEntry(hNcoll[4],Form("%d< L1cen < %d", limit[3],limit[4]),"lp");
-		leg->AddEntry(hNcoll[5],Form("%d< L1cen < 200",limit[4]),"lp");
+		leg->AddEntry(hNcoll[0],Form("0  < L1cen < %f",limit[0]),"lp");
+		leg->AddEntry(hNcoll[1],Form("%f < L1cen < %f",limit[0],limit[1]),"lp");
+		leg->AddEntry(hNcoll[2],Form("%f < L1cen < %f",limit[1],limit[2]),"lp");
+		leg->AddEntry(hNcoll[3],Form("%f < L1cen < %f",limit[2],limit[3]),"lp");
+		leg->AddEntry(hNcoll[4],Form("%f< L1cen < %f", limit[3],limit[4]),"lp");
+		leg->AddEntry(hNcoll[5],Form("%f< L1cen < 200",limit[4]),"lp");
 		leg->Draw();
 
-		canvasranges->SaveAs(Form("Plots/canvasranges_%s.eps",l1_input.Data()));
+			canvasrangesNcoll->SaveAs(Form("Plots/canvasrangesNcoll_%s.pdf",l1_input.Data()));
+
+	}
+	        canvasranges->SaveAs(Form("Plots/canvasranges_%s.pdf",l1_input.Data()));
 		canvasl1CentralityVsofflineCentrality->SaveAs(Form("Plots/canvasl1CentralityVsofflineCentrality_%s.pdf",l1_input.Data()));
 		canvasL1CentralityVsfflineCentrality->SaveAs(Form("Plots/canvasL1CentralityVsfflineCentrality_%s.pdf",l1_input.Data()));
 		canvasl1EtsumVsofflineCentrality->SaveAs(Form("Plots/canvasl1EtsumVsofflineCentrality_%s.pdf",l1_input.Data()));
@@ -289,17 +290,15 @@ void plotCentrality(TString l1_input, bool isdata=false)
 		canvascorrl1EtsumPlusVscorrl1EtsumMinus->SaveAs(Form("Plots/canvascorrl1EtsumPlusVscorrl1EtsumMinus_%s.pdf",l1_input.Data()));
 		canvascorrl1EtsumPlusVscorrl1EtsumMinus->SaveAs(Form("Plots/canvascorrl1EtsumPlusVscorrl1EtsumMinusNo_%s.pdf",l1_input.Data()));
 		canvascorrl1EtsumPlusVscorrl1EtsumMinusNoEvSel->SaveAs(Form("Plots/canvascorrl1EtsumPlusVscorrl1EtsumMinusNoEvSel_%s.pdf",l1_input.Data()));
-		canvasrangesNcoll->SaveAs(Form("Plots/canvasrangesNcoll_%s.pdf",l1_input.Data()));
 
-	}
 }
 
 
 int main(int argc, char **argv)
 {
-	if(argc == 2)
+	if(argc != 0)
 	{
-		plotCentrality(argv[1], argv[2]);
+		plotCentrality(argv[1]);
 		return 0;
 	}
 	else

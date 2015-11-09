@@ -1,34 +1,16 @@
-#include <TFile.h>
-#include <TTree.h>
-#include <TChain.h>
-#include <TCanvas.h>
-#include <TLegend.h>
-#include <TH1D.h>
-#include <TH2D.h>
-#include <TF1.h>
-#include <TProfile.h>
-#include <TLatex.h>
-#include <TGraph.h>
-#include <TString.h>
-#include <TLegendEntry.h>
-#include <TGraphAsymmErrors.h>
-#include <TMath.h>
 
-#include <vector>
-#include <iostream>
+#include "centralityCommon.h"
 
 const int MAXL1JETS = 8;
 const int MAXRCTREGIONS= 396;
 const int MAXJETS = 500;
 const Int_t THRESHOLDS = 30;
-const int NBINSCentrality=6;
-const int limit[5]={10,20,60,100,140};
 const int nBins = 100; 
 const double maxCen = 200.;
 const Double_t L1_THRESHOLD[12] = {0.,10.,20.,30.,40.,50.,100.,140.,160.,170.,180.,190.};
 
 
-void centralityCalibration(TString inHiForestFileName, TString outFileName, bool montecarlo = false)
+void centralityCalibration_MC(TString inHiForestFileName, TString outFileName)
 {
 	TFile *outFile = new TFile(outFileName,"RECREATE");
 	TFile *inFile = TFile::Open(inHiForestFileName);
@@ -45,8 +27,8 @@ void centralityCalibration(TString inHiForestFileName, TString outFileName, bool
 	l1Tree->SetBranchAddress("event",&l1_event);
 	l1Tree->SetBranchAddress("run",&l1_run);
 	l1Tree->SetBranchAddress("lumi",&l1_lumi);
-	l1Tree->SetBranchAddress("region_hwPt",l1_region_hwPt);
-	l1Tree->SetBranchAddress("region_hwEta",l1_region_hwEta);
+	l1Tree->SetBranchAddress("legacyregion_et",l1_region_hwPt);
+	l1Tree->SetBranchAddress("legacyregion_gctEta",l1_region_hwEta);
 
 	Int_t f_evt, f_run, f_lumi;
 	Float_t vz;
@@ -63,8 +45,11 @@ void centralityCalibration(TString inHiForestFileName, TString outFileName, bool
 
 
 	Int_t pcollisionEventSelection, pHBHENoiseFilter;
-	fSkimTree->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection);
-	fSkimTree->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter);
+        pcollisionEventSelection = 1;
+	pHBHENoiseFilter = 1;
+	//not defined in current skim tree for HLT :(
+	//fSkimTree->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection);
+	//fSkimTree->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter);
 
 	TH2D *hcorrl1EtsumPlusVscorrl1EtsumMinus = new TH2D("hcorrl1EtsumPlusVscorrl1EtsumMinus","L1 EtsumPlus vs L1 EtsumMinus; L1 EtsumMinus ; L1 EtsumPlus",100,0,9000,100,0,9000); 
 	TH2D *hcorrl1EtsumPlusVscorrl1EtsumMinusNoEvSel = new TH2D("hcorrl1EtsumPlusVscorrl1EtsumMinusNoEvSel","L1 EtsumPlus vs L1 EtsumMinus; L1 EtsumMinus ; L1 EtsumPlus",100,0,9000,100,0,9000);
@@ -100,8 +85,8 @@ void centralityCalibration(TString inHiForestFileName, TString outFileName, bool
 	}
 
 	int countCalib = 0;
-	//Long64_t entries = f1Tree->GetEntries();
-	Long64_t entries=10000;
+	Long64_t entries = f1Tree->GetEntries();
+	//Long64_t entries=10000;
 	for(Long64_t j = 0; j < entries; ++j)
 	{
 		if(j % 10000 == 0)
@@ -114,7 +99,7 @@ void centralityCalibration(TString inHiForestFileName, TString outFileName, bool
 		f1Tree->GetEntry(j);
 
 		bool goodEvent = false;
-		if((pcollisionEventSelection == 1) && (montecarlo || (pHBHENoiseFilter == 1)) && (TMath::Abs(vz) < 15))
+		if((pcollisionEventSelection == 1) && (isMC || (pHBHENoiseFilter == 1)) && (TMath::Abs(vz) < 15))
 		{
 			goodEvent = true;
 		}
@@ -158,10 +143,10 @@ void centralityCalibration(TString inHiForestFileName, TString outFileName, bool
 		fSkimTree->GetEntry(j);
 		l1Tree->GetEntry(j);
 		f1Tree->GetEntry(j);
-		fEvtGen->GetEntry(j);
+		//fEvtGen->GetEntry(j);
 
 		bool goodEvent = false;
-		if((pcollisionEventSelection == 1) && (montecarlo || (pHBHENoiseFilter == 1)) && (TMath::Abs(vz) < 15))
+		if((pcollisionEventSelection == 1) && (isMC || (pHBHENoiseFilter == 1)) && (TMath::Abs(vz) < 15))
 		{
 			goodEvent = true;
 		}
@@ -191,19 +176,25 @@ void centralityCalibration(TString inHiForestFileName, TString outFileName, bool
 		profilel1EtsumVsofflineCentrality->Fill(hiBin,etsum);  	  
 		//L1centrality=fprofileofflineCentralityVsl1Etsum_Calibration->Eval(etsum);
 		L1centrality=fprofileofflinel1EtsumVsCentrality_Calibration->GetX(etsum);
-		printf("L1centrality %f\n",L1centrality);
+		//printf("L1centrality %f\n",L1centrality);
 		hcorrL1CentralityVsfflineCentrality->Fill(hiBin,L1centrality);
 		profilel1CentralityVsofflineCentrality->Fill(hiBin,L1centrality);
 
-		double Etsum_Bin[5];
-		for (int j=0; j<5;j++)Etsum_Bin[j]=fprofileofflinel1EtsumVsCentrality_Calibration->Eval((double)(limit[j]));
+		double Etsum_Bin[10];
+	        double offCentRes[10];
+		for (int j=0; j<10;j++){
+			if (j==0 || (j%2)==0){offCentRes[j]=limit[j]+deltaC;}
+                    	else {offCentRes[j]=limit[j]-deltaC;}
+			Etsum_Bin[j]=fprofileofflinel1EtsumVsCentrality_Calibration->Eval((double)(offCentRes[j]));
+			//std::cout<< "etSum = " << Etsum_Bin[j] << endl;
+			}
 
-		if(etsum>Etsum_Bin[0]) {hOffline[0]->Fill(hiBin); hNcoll[0]->Fill(ncoll);}
-		if(etsum>Etsum_Bin[1] && etsum<Etsum_Bin[0]) {hOffline[1]->Fill(hiBin); hNcoll[1]->Fill(ncoll);}
-		if(etsum>Etsum_Bin[2] && etsum<Etsum_Bin[1]) {hOffline[2]->Fill(hiBin); hNcoll[2]->Fill(ncoll);}
-		if(etsum>Etsum_Bin[3] && etsum<Etsum_Bin[2]) {hOffline[3]->Fill(hiBin); hNcoll[3]->Fill(ncoll);}
-		if(etsum>Etsum_Bin[4] && etsum<Etsum_Bin[3]) {hOffline[4]->Fill(hiBin); hNcoll[4]->Fill(ncoll);}
-		if(etsum<Etsum_Bin[4]) {hOffline[5]->Fill(hiBin); hNcoll[5]->Fill(ncoll);}
+		if(etsum>Etsum_Bin[0]) {hOffline[0]->Fill(hiBin);hNcoll[0]->Fill(ncoll);}
+		if(etsum>Etsum_Bin[2] && etsum<Etsum_Bin[1]) {hOffline[1]->Fill(hiBin); hNcoll[1]->Fill(ncoll);}
+		if(etsum>Etsum_Bin[4] && etsum<Etsum_Bin[3]) {hOffline[2]->Fill(hiBin); hNcoll[2]->Fill(ncoll);}
+		if(etsum>Etsum_Bin[6] && etsum<Etsum_Bin[5]) {hOffline[3]->Fill(hiBin); hNcoll[3]->Fill(ncoll);}
+		if(etsum>Etsum_Bin[8] && etsum<Etsum_Bin[7]) {hOffline[4]->Fill(hiBin); hNcoll[4]->Fill(ncoll);}
+		if(etsum<Etsum_Bin[9]) {hOffline[5]->Fill(hiBin); hNcoll[5]->Fill(ncoll);}
 		hNcollAll->Fill(ncoll);
 		fCenOffline->Fill(hiBin);
 
@@ -257,12 +248,12 @@ void centralityCalibration(TString inHiForestFileName, TString outFileName, bool
 
 
 
-int main(int argc, char **argv)
+int main(int argc,char **argv)
 {
-	if(argc == 3)
+	if(argc != 0)
 	{
-		centralityCalibration(argv[1], argv[2], argv[3]);
-		return 0;
+      	centralityCalibration_MC(argv[1], argv[2]);
+      	return 0;
 	}
 	else
 	{

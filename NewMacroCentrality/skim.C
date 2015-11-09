@@ -10,7 +10,7 @@
 #include "TFile.h"
 
 //--how many events do you want to keep?
-#define EVENTS 10000
+#define EVENTS 100000
 
 TTree* makeSmall(TTree* told) {
    TTree *tnew = told->CloneTree(0);
@@ -24,7 +24,8 @@ TTree* makeSmall(TTree* told) {
 
 //-------
 //this is used to skim the file located at MIT
-// /mnt/hadoop/cms/store/user/luck/L1Emulator/HydjetMB_502TeV_740pre8_MCHI2_74_V3_HiForestAndEmulator_v5.root
+// /cms/store/user/velicanu/HydjetMB5020_750_75X_mcRun2_HeavyIon_v1_RealisticHICollisions2011_STARTHI50_mc_L1_HLT_HIFOREST_merged/0.root 
+//
 //-------
 
 void skim(const char *filein, const char *fileout) {

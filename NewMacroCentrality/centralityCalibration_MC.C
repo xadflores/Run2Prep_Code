@@ -74,7 +74,7 @@ void centralityCalibration_MC(TString inHiForestFileName, TString outFileName)
 
 
 	for(int i = 0; i < NBINSCentrality; ++i){
-		hOffline[i]= new TH1D(Form("hOffline_Bin%d",i),Form("hOffline_Bin%d; Offline Centrality; Entries",i),260,-30.,230.);
+		hOffline[i]= new TH1D(Form("hOffline_Bin%d",i),Form("hOffline_Bin%d; Offline Centrality; Entries",i),130,-30.,230.);
 		hNcoll[i]= new TH1D(Form("hNcoll_Bin%d",i),Form("hNcoll_Bin%d; N_{coll}; Entries",i),2000,-0.5,1999.5);
 	}
 
@@ -183,8 +183,8 @@ void centralityCalibration_MC(TString inHiForestFileName, TString outFileName)
 		double Etsum_Bin[10];
 	        double offCentRes[10];
 		for (int j=0; j<10;j++){
-			if (j==0 || (j%2)==0){offCentRes[j]=limit[j]+deltaC;}
-                    	else {offCentRes[j]=limit[j]-deltaC;}
+			if (j==0 || (j%2)==0){offCentRes[j]=limit[j]+deltaC[j];}
+                    	else {offCentRes[j]=limit[j]-deltaC[j];}
 			Etsum_Bin[j]=fprofileofflinel1EtsumVsCentrality_Calibration->Eval((double)(offCentRes[j]));
 			//std::cout<< "etSum = " << Etsum_Bin[j] << endl;
 			}
@@ -250,7 +250,7 @@ void centralityCalibration_MC(TString inHiForestFileName, TString outFileName)
 
 int main(int argc,char **argv)
 {
-	if(argc != 0)
+	if(argc == 3)
 	{
       	centralityCalibration_MC(argv[1], argv[2]);
       	return 0;

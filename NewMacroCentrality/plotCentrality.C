@@ -296,7 +296,7 @@ void plotCentrality(TString l1_input)
 
 int main(int argc, char **argv)
 {
-	if(argc != 0)
+	if(argc == 2)
 	{
 		plotCentrality(argv[1]);
 		return 0;

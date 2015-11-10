@@ -243,7 +243,7 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 
 int main(int argc,char **argv)
 {
-	if(argc != 0)
+	if(argc == 3)
 	{
       	centralityCalibrationRD(argv[1], argv[2]);
       	return 0;

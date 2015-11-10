@@ -2,25 +2,29 @@
 #To run the centrality calibration and plotting!
 
 #----Variable Definition and Replacement
-#r is the amount offline cent. to overlap, ie  1% of 200 = 2
-#r={0,0,0,0,0,0,0,0,0,0} 
-r={0,0,0,0,0,2,2,2,2,2} 
+echo -n "Please enter version type ie v0 can be nominal: "
+read ResType
+
+#r is the amount offline cent. to overlap, ie  1% of 200 = 2, 
+#These overlaps are per boundary left/right side so 1 is 2 overall width of overlap. 
+echo -n "Please enter offline cent. overlaps in ie nominal format {0,0,0,0,0,0,0,0,0,0}: "
+read r 
 sed -i -e 's/const int deltaC.*;/const int deltaC[10] = '${r}';/g' centralityCommon.h
 
 #m , 0=Data, 1=MC
-m=0
+echo -n "Input type of sample 1 for MC, 0 for RD: "
+read m
 sed -i -e 's/int isMC = .*;/int isMC = '${m}';/g' centralityCommon.h
 
-#mkdir Plots #uncomment if you don't have this directory
 
 #-----MC or Data files
 if [ $m = 1 ]; then
 	Type=(MC)
-	InputType=(${Type})
+	InputType=(${Type}_${ResType})
 	InputHiForest=("root://cms-xrd-global.cern.ch///store/group/phys_heavyions/chflores/HydjetMB5020_750_75X_mcRun2_HeavyIon_v1_RealisticHICollisions2011_STARTHI50_mc_L1_HLT_HIFOREST_skim2.root")
 else
 	Type=(RD)
-	InputType=(${Type})
+	InputType=(${Type}_${ResType})
 	InputHiForest=("root://cms-xrd-global.cern.ch///store/group/phys_heavyions/chflores/HIMinBiasUPC_HIForest_all.root")
 fi
 

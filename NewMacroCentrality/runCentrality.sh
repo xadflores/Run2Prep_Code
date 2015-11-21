@@ -16,16 +16,21 @@ echo -n "Input type of sample 1 for MC, 0 for RD: "
 read m
 sed -i -e 's/int isMC = .*;/int isMC = '${m}';/g' centralityCommon.h
 
+#--check directory
+if [ ! -d Plots ]; then
+	mkdir Plots
+fi
+
 
 #-----MC or Data files
 if [ $m = 1 ]; then
 	Type=(MC)
 	InputType=(${Type}_${ResType})
-	InputHiForest=("root://cms-xrd-global.cern.ch///store/group/phys_heavyions/chflores/HydjetMB5020_750_75X_mcRun2_HeavyIon_v1_RealisticHICollisions2011_STARTHI50_mc_L1_HLT_HIFOREST_skim2.root")
+	InputHiForest=("root://cms-xrd-global.cern.ch///store/group/phys_heavyions/chflores/Foresting_RunPrep2015/HydjetMB5020_750_75X_mcRun2_HeavyIon_v1_RealisticHICollisions2011_STARTHI50_mc_L1_HLT_HIFOREST_skim2.root")
 else
 	Type=(RD)
 	InputType=(${Type}_${ResType})
-	InputHiForest=("root://cms-xrd-global.cern.ch///store/group/phys_heavyions/chflores/HIMinBiasUPC_HIForest_all.root")
+	InputHiForest=("root://cms-xrd-global.cern.ch///store/group/phys_heavyions/chflores/Foresting_RunPrep2015/HIMinBiasUPC_HIForest_all.root")
 fi
 
 #----Compiling and running code

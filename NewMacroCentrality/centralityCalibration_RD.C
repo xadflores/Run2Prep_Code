@@ -21,16 +21,16 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 	
 	vector<int>     *legacyregion_et;
 	vector<int>     *legacyregion_gctEta;
-        TBranch        *b_legacyregion_et;   //!
-        TBranch        *b_legacyregion_gctEta;   //!
+    TBranch        *b_legacyregion_et;   //!
+    TBranch        *b_legacyregion_gctEta;   //!
        
 	legacyregion_et=0;
 	legacyregion_gctEta=0;
 	l1Tree->SetBranchAddress("event",&l1_event);
 	l1Tree->SetBranchAddress("run",&l1_run);
 	l1Tree->SetBranchAddress("lumi",&l1_lumi);
-        l1Tree->SetBranchAddress("legacyregion_et", &legacyregion_et, &b_legacyregion_et);
-        l1Tree->SetBranchAddress("legacyregion_gctEta", &legacyregion_gctEta, &b_legacyregion_gctEta);
+    l1Tree->SetBranchAddress("legacyregion_et", &legacyregion_et, &b_legacyregion_et);
+    l1Tree->SetBranchAddress("legacyregion_gctEta", &legacyregion_gctEta, &b_legacyregion_gctEta);
 
 	Int_t f_evt, f_run, f_lumi;
 	Float_t vz;
@@ -46,7 +46,7 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 
 
 	Int_t pcollisionEventSelection, pHBHENoiseFilterResultProducer;
-        pcollisionEventSelection = 1;
+    pcollisionEventSelection = 1;
 	pHBHENoiseFilterResultProducer = 1;
 	//fSkimTree->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection);
 	//fSkimTree->SetBranchAddress("pHBHENoiseFilterResultProducer",&pHBHENoiseFilterResultProducer);

@@ -14,11 +14,11 @@ void centralityCalibrationRD(TString inHiForestFileName,  TString outFileName)
 {
 	TFile *outFile = new TFile(outFileName,"RECREATE");
 	TFile *inFile = TFile::Open(inHiForestFileName);
-	TFile *inFileCen = new TFile("/data/yilmaz/centrality2015/friendly_centrality_HiForest_Streamer_run262315.root");
 	TTree *fEvtTree = (TTree*)inFile->Get("hiEvtAnalyzer/HiTree");
 	TTree *fSkimTree = (TTree*)inFile->Get("skimanalysis/HltTree");
 	TTree *l1Tree = (TTree*)inFile->Get("UnpackerResults/L1UpgradeTree");
 	TTree *hltTree = (TTree*)inFile->Get("hltanalysis/HltTree");
+	TFile *inFileCen = new TFile("/data/yilmaz/centrality2015/friendly_centrality_HiForest_Streamer_run262315.root");
     TTree* tcen = (TTree*)inFileCen->Get("anaCentrality");
     l1Tree->AddFriend(tcen);
 
@@ -60,7 +60,6 @@ void centralityCalibrationRD(TString inHiForestFileName,  TString outFileName)
 	fEvtTree->SetBranchAddress("vz",&vz);
 	//fEvtTree->SetBranchAddress("hiBin",&hiBin);
 	fEvtTree->SetBranchAddress("hiHF",&hiHF);
-//	tcen->SetBranchAddress("anaBin",&hiBin);
 
 	Int_t pcollisionEventSelection;
 	//Int_t pHBHENoiseFilterResultProducer;

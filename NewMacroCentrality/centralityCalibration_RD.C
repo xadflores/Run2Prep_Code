@@ -24,9 +24,9 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 	vector<int>     *legacyregion_et;
 	vector<int>     *legacyregion_gctEta;
 	vector<int>     *legacyregion_bx;
-    TBranch        *b_legacyregion_et;   //!
-    TBranch        *b_legacyregion_gctEta;   //!
-    TBranch        *b_legacyregion_bx;   //!
+    	TBranch        *b_legacyregion_et;   //!
+        TBranch        *b_legacyregion_gctEta;   //!
+        TBranch        *b_legacyregion_bx;   //!
     
     
     Int_t HLT_HIL1MinimumBiasHF1AND_v1; 
@@ -87,7 +87,7 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 
 
 	for(int i = 0; i < NBINSCentrality; ++i){
-		hOffline[i]= new TH1D(Form("hOffline_Bin%d",i),Form("hOffline_Bin%d; Offline Centrality; Entries",i),110,-10,210);
+		hOffline[i]= new TH1D(Form("hOffline_Bin%d",i),Form("hOffline_Bin%d; Offline Centrality; Entries",i),220,-10,210);
 	}
 
 	TH1D *accepted[12];

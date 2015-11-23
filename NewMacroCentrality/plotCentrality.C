@@ -167,7 +167,7 @@ void plotCentrality(TString l1_input)
 	TCanvas *canvasranges=new TCanvas("canvasranges","canvasranges",600,500);
 	canvasranges->cd();
 
-	hOffline[0]->SetMaximum(3000);
+	hOffline[0]->SetMaximum(800);
 	hOffline[0]->GetXaxis()->SetRangeUser(-10,210.);
 	//hOffline[0]->GetYaxis()->SetRangeUser(0,100.);
 	hOffline[0]->GetYaxis()->SetTitleOffset(1.5);
@@ -184,6 +184,16 @@ void plotCentrality(TString l1_input)
 		hOffline[j]->Draw("same hist e");
 
 	}
+        TLine *line1 = new TLine(10,0,10,600);
+        line1->Draw("same");
+        TLine *line2 = new TLine(20,0,20,600);
+        line2->Draw("same");
+        TLine *line3 = new TLine(60,0,60,600);
+        line3->Draw("same");
+        TLine *line4 = new TLine(100,0,100,600);
+        line4->Draw("same");
+        TLine *line5 = new TLine(140,0,140,600);
+        line5->Draw("same");
 
 	double newReslimit[10];
         for(int k=0; k<10;k++){

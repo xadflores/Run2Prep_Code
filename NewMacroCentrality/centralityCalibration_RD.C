@@ -10,14 +10,17 @@ const double maxCen = 200.;
 const Double_t L1_THRESHOLD[12] = {0.,10.,20.,30.,40.,50.,100.,140.,160.,170.,180.,190.};
 
 
-void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
+void centralityCalibrationRD(TString inHiForestFileName,  TString outFileName)
 {
 	TFile *outFile = new TFile(outFileName,"RECREATE");
 	TFile *inFile = TFile::Open(inHiForestFileName);
+	TFile *inFileCen = new TFile("/data/yilmaz/centrality2015/friendly_centrality_HiForest_Streamer_run262315.root");
 	TTree *fEvtTree = (TTree*)inFile->Get("hiEvtAnalyzer/HiTree");
 	TTree *fSkimTree = (TTree*)inFile->Get("skimanalysis/HltTree");
 	TTree *l1Tree = (TTree*)inFile->Get("UnpackerResults/L1UpgradeTree");
 	TTree *hltTree = (TTree*)inFile->Get("hltanalysis/HltTree");
+    TTree* tcen = (TTree*)inFileCen->Get("anaCentrality");
+    l1Tree->AddFriend(tcen);
 
 	Int_t l1_event, l1_run, l1_lumi;  
 	
@@ -34,6 +37,10 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
     hltTree->SetBranchAddress("HLT_HIL1MinimumBiasHF1AND_v1",&HLT_HIL1MinimumBiasHF1AND_v1);
    // hltTree->SetBranchAddress("L1_Centrality_ext0_100_HFplusANDminusTH0",&L1_Centrality_ext0_100_HFplusORminusTH0);
 
+	Int_t f_evt, f_run, f_lumi,f_phfCoincFilter3;
+	Float_t vz;
+	Int_t hiBin;
+	float hiHF;
        
 	legacyregion_et=0;
 	legacyregion_gctEta=0;
@@ -44,20 +51,16 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
     l1Tree->SetBranchAddress("legacyregion_et", &legacyregion_et, &b_legacyregion_et);
     l1Tree->SetBranchAddress("legacyregion_gctEta", &legacyregion_gctEta, &b_legacyregion_gctEta);
     l1Tree->SetBranchAddress("legacyregion_bx", &legacyregion_bx, &b_legacyregion_bx);
-
-	Int_t f_evt, f_run, f_lumi,f_phfCoincFilter3;
-	Float_t vz;
-	Int_t hiBin;
-	float hiHF;
-
+    l1Tree->SetBranchAddress("anaBin",&hiBin);
+    
 	fSkimTree->SetBranchAddress("phfCoincFilter3",&f_phfCoincFilter3);
 	fEvtTree->SetBranchAddress("evt",&f_evt);
 	fEvtTree->SetBranchAddress("run",&f_run);
 	fEvtTree->SetBranchAddress("lumi",&f_lumi);
 	fEvtTree->SetBranchAddress("vz",&vz);
-	fEvtTree->SetBranchAddress("hiBin",&hiBin);
+	//fEvtTree->SetBranchAddress("hiBin",&hiBin);
 	fEvtTree->SetBranchAddress("hiHF",&hiHF);
-
+//	tcen->SetBranchAddress("anaBin",&hiBin);
 
 	Int_t pcollisionEventSelection;
 	//Int_t pHBHENoiseFilterResultProducer;
@@ -98,7 +101,7 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 
 	int countCalib = 0;
 	Long64_t entries = l1Tree->GetEntries();
-	//Long64_t entries=10000;
+ 	//Long64_t entries=10000;
 	for(Long64_t j = 0; j < entries; ++j)
 	{
 		if(j % 10000 == 0)
@@ -111,8 +114,8 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 		hltTree->GetEntry(j);
 
 		bool goodEvent = false;
-		//if((HLT_HIL1MinimumBiasHF1AND_v1==1 &&pcollisionEventSelection == 1 && f_phfCoincFilter3==1) && (TMath::Abs(vz) < 15))
-		if((HLT_HIL1MinimumBiasHF1AND_v1==1 &&pcollisionEventSelection == 1) && (TMath::Abs(vz) < 15))
+		if((HLT_HIL1MinimumBiasHF1AND_v1==1 &&pcollisionEventSelection == 1 && f_phfCoincFilter3==1) && (TMath::Abs(vz) < 15))
+		//if((HLT_HIL1MinimumBiasHF1AND_v1==1 &&pcollisionEventSelection == 1) && (TMath::Abs(vz) < 15))
 		{
 			goodEvent = true;
 		}
@@ -164,8 +167,8 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 		hltTree->GetEntry(j);
 
 		bool goodEvent = false;
-		//if((HLT_HIL1MinimumBiasHF1AND_v1==1 &&pcollisionEventSelection == 1 && f_phfCoincFilter3==1) && (TMath::Abs(vz) < 15))
-		if((HLT_HIL1MinimumBiasHF1AND_v1==1 &&pcollisionEventSelection == 1) && (TMath::Abs(vz) < 15))
+		if((HLT_HIL1MinimumBiasHF1AND_v1==1 &&pcollisionEventSelection == 1 && f_phfCoincFilter3==1) && (TMath::Abs(vz) < 15))
+		//if((HLT_HIL1MinimumBiasHF1AND_v1==1 &&pcollisionEventSelection == 1) && (TMath::Abs(vz) < 15))
 
 		{
 			goodEvent = true;

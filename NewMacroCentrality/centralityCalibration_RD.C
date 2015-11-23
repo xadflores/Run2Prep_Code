@@ -13,20 +13,24 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 {
 	TFile *outFile = new TFile(outFileName,"RECREATE");
 	TFile *inFile = TFile::Open(inHiForestFileName);
-	TTree *f1Tree = (TTree*)inFile->Get("akPu3CaloJetAnalyzer/t");
 	TTree *fEvtTree = (TTree*)inFile->Get("hiEvtAnalyzer/HiTree");
 	TTree *fSkimTree = (TTree*)inFile->Get("skimanalysis/HltTree");
-	TTree *l1Tree = (TTree*)inFile->Get("myResults/L1UpgradeTree");
+	TTree *l1Tree = (TTree*)inFile->Get("UnpackerResults/L1UpgradeTree");
 
 	Int_t l1_event, l1_run, l1_lumi;  
-	Int_t l1_region_hwPt[MAXRCTREGIONS];
-	Int_t l1_region_hwEta[MAXRCTREGIONS];
-
+	
+	vector<int>     *legacyregion_et;
+	vector<int>     *legacyregion_gctEta;
+        TBranch        *b_legacyregion_et;   //!
+        TBranch        *b_legacyregion_gctEta;   //!
+       
+	legacyregion_et=0;
+	legacyregion_gctEta=0;
 	l1Tree->SetBranchAddress("event",&l1_event);
 	l1Tree->SetBranchAddress("run",&l1_run);
 	l1Tree->SetBranchAddress("lumi",&l1_lumi);
-	l1Tree->SetBranchAddress("legacyregion_et",l1_region_hwPt);
-	l1Tree->SetBranchAddress("legacyregion_gctEta",l1_region_hwEta);
+        l1Tree->SetBranchAddress("legacyregion_et", &legacyregion_et, &b_legacyregion_et);
+        l1Tree->SetBranchAddress("legacyregion_gctEta", &legacyregion_gctEta, &b_legacyregion_gctEta);
 
 	Int_t f_evt, f_run, f_lumi;
 	Float_t vz;
@@ -42,10 +46,10 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 
 
 	Int_t pcollisionEventSelection, pHBHENoiseFilterResultProducer;
-        //pcollisionEventSelection = 1;
-	//pHBHENoiseFilter = 1;
-	fSkimTree->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection);
-	fSkimTree->SetBranchAddress("pHBHENoiseFilterResultProducer",&pHBHENoiseFilterResultProducer);
+        pcollisionEventSelection = 1;
+	pHBHENoiseFilterResultProducer = 1;
+	//fSkimTree->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection);
+	//fSkimTree->SetBranchAddress("pHBHENoiseFilterResultProducer",&pHBHENoiseFilterResultProducer);
 
 	TH2D *hcorrl1EtsumPlusVscorrl1EtsumMinus = new TH2D("hcorrl1EtsumPlusVscorrl1EtsumMinus","L1 EtsumPlus vs L1 EtsumMinus; L1 EtsumMinus ; L1 EtsumPlus",100,0,9000,100,0,9000); 
 	TH2D *hcorrl1EtsumPlusVscorrl1EtsumMinusNoEvSel = new TH2D("hcorrl1EtsumPlusVscorrl1EtsumMinusNoEvSel","L1 EtsumPlus vs L1 EtsumMinus; L1 EtsumMinus ; L1 EtsumPlus",100,0,9000,100,0,9000);
@@ -78,7 +82,7 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 	}
 
 	int countCalib = 0;
-	Long64_t entries = f1Tree->GetEntries();
+	Long64_t entries = l1Tree->GetEntries();
 	//Long64_t entries=10000;
 	for(Long64_t j = 0; j < entries; ++j)
 	{
@@ -89,7 +93,6 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 		fEvtTree->GetEntry(j);
 		fSkimTree->GetEntry(j);
 		l1Tree->GetEntry(j);
-		f1Tree->GetEntry(j);
 
 		bool goodEvent = false;
 		if((pcollisionEventSelection == 1) && (isMC || (pHBHENoiseFilterResultProducer == 1)) && (TMath::Abs(vz) < 15))
@@ -103,9 +106,13 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 		int l1_etsumMinus=0;
 
 		for (int i=0;i<396;i++){
-			if (l1_region_hwEta[i]<=3) l1_etsumPlus=l1_etsumPlus+l1_region_hwPt[i];   
-			if (l1_region_hwEta[i]>=18) l1_etsumMinus=l1_etsumMinus+l1_region_hwPt[i];   
-		}
+                        if (legacyregion_gctEta->at(i)<=3) l1_etsumPlus=l1_etsumPlus+legacyregion_et->at(i);
+                        if (legacyregion_gctEta->at(i)>=18) l1_etsumMinus=l1_etsumMinus+legacyregion_et->at(i);
+
+                }
+
+
+
 		etsum=l1_etsumPlus+l1_etsumMinus;
 		//std::cout<<"etsum="<<etsum<<std::endl;
 		//std::cout<<"l1_etsumPlus="<<l1_etsumPlus<<std::endl;
@@ -135,7 +142,6 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 		fEvtTree->GetEntry(j);
 		fSkimTree->GetEntry(j);
 		l1Tree->GetEntry(j);
-		f1Tree->GetEntry(j);
 		//fEvtGen->GetEntry(j);
 
 		bool goodEvent = false;

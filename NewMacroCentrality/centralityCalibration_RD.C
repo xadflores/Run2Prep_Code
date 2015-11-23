@@ -1,4 +1,5 @@
 #include "centralityCommon.h"
+using namespace std;
 
 const int MAXL1JETS = 8;
 const int MAXRCTREGIONS= 396;
@@ -32,11 +33,12 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
     l1Tree->SetBranchAddress("legacyregion_et", &legacyregion_et, &b_legacyregion_et);
     l1Tree->SetBranchAddress("legacyregion_gctEta", &legacyregion_gctEta, &b_legacyregion_gctEta);
 
-	Int_t f_evt, f_run, f_lumi;
+	Int_t f_evt, f_run, f_lumi,f_phfCoincFilter3;
 	Float_t vz;
 	Int_t hiBin;
 	float hiHF;
 
+	fSkimTree->SetBranchAddress("phfCoincFilter3",&f_phfCoincFilter3);
 	fEvtTree->SetBranchAddress("evt",&f_evt);
 	fEvtTree->SetBranchAddress("run",&f_run);
 	fEvtTree->SetBranchAddress("lumi",&f_lumi);
@@ -95,7 +97,7 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 		l1Tree->GetEntry(j);
 
 		bool goodEvent = false;
-		if((pcollisionEventSelection == 1) && (isMC || (pHBHENoiseFilterResultProducer == 1)) && (TMath::Abs(vz) < 15))
+		if((pcollisionEventSelection == 1 && f_phfCoincFilter3==1) && (isMC || (pHBHENoiseFilterResultProducer == 1)) && (TMath::Abs(vz) < 15))
 		{
 			goodEvent = true;
 		}
@@ -125,7 +127,7 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 
 	TF1 *fprofileofflineCentralityVsl1Etsum_Calibration = new TF1("fprofileofflineCentralityVsl1Etsum_Calibration","pol9",0,3500);
 	profileofflineCentralityVsl1Etsum_Calibration->Fit("fprofileofflineCentralityVsl1Etsum_Calibration");
-	TF1 *fprofileofflinel1EtsumVsCentrality_Calibration = new TF1("fprofileofflinel1EtsumVsCentrality_Calibration","pol9",0,3500);
+	TF1 *fprofileofflinel1EtsumVsCentrality_Calibration = new TF1("fprofileofflinel1EtsumVsCentrality_Calibration","pol9",10,6000);
 	profilel1EtsumVsofflineCentrality_Calibration->Fit("fprofileofflinel1EtsumVsCentrality_Calibration");
 
 
@@ -145,7 +147,7 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 		//fEvtGen->GetEntry(j);
 
 		bool goodEvent = false;
-		if((pcollisionEventSelection == 1) && (isMC || (pHBHENoiseFilterResultProducer == 1)) && (TMath::Abs(vz) < 15))
+		if((pcollisionEventSelection == 1 && f_phfCoincFilter3==1) && (isMC || (pHBHENoiseFilterResultProducer == 1)) && (TMath::Abs(vz) < 15))
 		{
 			goodEvent = true;
 		}

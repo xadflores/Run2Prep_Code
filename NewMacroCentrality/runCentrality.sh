@@ -31,17 +31,17 @@ else
 	Type=(RD)
 	InputType=(${Type}_${ResType})
 	#InputHiForest=("root://cms-xrd-global.cern.ch///store/group/phys_heavyions/chflores/Foresting_RunPrep2015/HIMinBiasUPC_HIForest_all.root")
-	InputHiForest=("root://cms-xrd-global.cern.ch///store/group/phys_heavyions/velicanu/Fourth5TeVPbPbForest_4761Events.root")
+	InputHiForest=("root://cms-xrd-global.cern.ch///store/group/phys_heavyions/velicanu/forest/Run2015E/HIExpressPhysics/Merged/HiForest_Streamer_run262315.root")
 	#InputHiForest=("root://cms-xrd-global.cern.ch///store/group/phys_heavyions/velicanu/forest/Run2015E/HIExpressPhysics/Merged/HiForest_Streamer_run262315.root")
 fi
 
 #----Compiling and running code
-	g++ centralityCalibration_${Type}.C $(root-config --cflags --libs) -Werror -Wall -Wextra -O2 -o centralityCalibration_${Type}.exe || exit 1
-	g++ plotCentrality.C $(root-config --cflags --libs) -Werror -Wall -Wextra -O2 -o plotCentrality.exe || exit 1
+	g++ centralityCalibration_${Type}.C $(root-config --cflags --libs) -Werror -Wall -Wextra -O2 -o centralityCalibration_${Type}.exe 
+	g++ plotCentrality.C $(root-config --cflags --libs) -Werror -Wall -Wextra -O2 -o plotCentrality.exe
 
 	for cases in 0
 	do
 	  OutputFile="${InputType[cases]}_CentralityCalibration.root"
-	  ./centralityCalibration_${Type}.exe "${InputHiForest[cases]}" "$OutputFile" || exit 1
-	  ./plotCentrality.exe "${InputType[cases]}" || exit 1
+	  ./centralityCalibration_${Type}.exe "${InputHiForest[cases]}" "$OutputFile" 
+	  ./plotCentrality.exe "${InputType[cases]}"
 	done

@@ -17,6 +17,7 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 	TTree *fEvtTree = (TTree*)inFile->Get("hiEvtAnalyzer/HiTree");
 	TTree *fSkimTree = (TTree*)inFile->Get("skimanalysis/HltTree");
 	TTree *l1Tree = (TTree*)inFile->Get("UnpackerResults/L1UpgradeTree");
+	TTree *hltTree = (TTree*)inFile->Get("hltanalysis/HltTree");
 
 	Int_t l1_event, l1_run, l1_lumi;  
 	
@@ -26,6 +27,13 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
     TBranch        *b_legacyregion_et;   //!
     TBranch        *b_legacyregion_gctEta;   //!
     TBranch        *b_legacyregion_bx;   //!
+    
+    
+    Int_t HLT_HIL1MinimumBiasHF1AND_v1; 
+   // Int_t L1_Centrality_ext0_100_HFplusANDminusTH0; 
+    hltTree->SetBranchAddress("HLT_HIL1MinimumBiasHF1AND_v1",&HLT_HIL1MinimumBiasHF1AND_v1);
+   // hltTree->SetBranchAddress("L1_Centrality_ext0_100_HFplusANDminusTH0",&L1_Centrality_ext0_100_HFplusORminusTH0);
+
        
 	legacyregion_et=0;
 	legacyregion_gctEta=0;
@@ -51,9 +59,10 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 	fEvtTree->SetBranchAddress("hiHF",&hiHF);
 
 
-	Int_t pcollisionEventSelection, pHBHENoiseFilterResultProducer;
+	Int_t pcollisionEventSelection;
+	//Int_t pHBHENoiseFilterResultProducer;
     pcollisionEventSelection = 1;
-	pHBHENoiseFilterResultProducer = 1;
+	//pHBHENoiseFilterResultProducer = 1;
 	//fSkimTree->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection);
 	//fSkimTree->SetBranchAddress("pHBHENoiseFilterResultProducer",&pHBHENoiseFilterResultProducer);
 
@@ -99,9 +108,11 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 		fEvtTree->GetEntry(j);
 		fSkimTree->GetEntry(j);
 		l1Tree->GetEntry(j);
+		hltTree->GetEntry(j);
 
 		bool goodEvent = false;
-		if((pcollisionEventSelection == 1 && f_phfCoincFilter3==1) && (isMC || (pHBHENoiseFilterResultProducer == 1)) && (TMath::Abs(vz) < 15))
+		//if((HLT_HIL1MinimumBiasHF1AND_v1==1 &&pcollisionEventSelection == 1 && f_phfCoincFilter3==1) && (TMath::Abs(vz) < 15))
+		if((HLT_HIL1MinimumBiasHF1AND_v1==1 &&pcollisionEventSelection == 1) && (TMath::Abs(vz) < 15))
 		{
 			goodEvent = true;
 		}
@@ -133,7 +144,7 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 
 	TF1 *fprofileofflineCentralityVsl1Etsum_Calibration = new TF1("fprofileofflineCentralityVsl1Etsum_Calibration","pol9",0,3500);
 	profileofflineCentralityVsl1Etsum_Calibration->Fit("fprofileofflineCentralityVsl1Etsum_Calibration");
-	TF1 *fprofileofflinel1EtsumVsCentrality_Calibration = new TF1("fprofileofflinel1EtsumVsCentrality_Calibration","pol9",10,6000);
+	TF1 *fprofileofflinel1EtsumVsCentrality_Calibration = new TF1("fprofileofflinel1EtsumVsCentrality_Calibration","pol9",0,7000);
 	profilel1EtsumVsofflineCentrality_Calibration->Fit("fprofileofflinel1EtsumVsCentrality_Calibration");
 
 
@@ -150,10 +161,12 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 		fEvtTree->GetEntry(j);
 		fSkimTree->GetEntry(j);
 		l1Tree->GetEntry(j);
-		//fEvtGen->GetEntry(j);
+		hltTree->GetEntry(j);
 
 		bool goodEvent = false;
-		if((pcollisionEventSelection == 1 && f_phfCoincFilter3==1) && (isMC || (pHBHENoiseFilterResultProducer == 1)) && (TMath::Abs(vz) < 15))
+		//if((HLT_HIL1MinimumBiasHF1AND_v1==1 &&pcollisionEventSelection == 1 && f_phfCoincFilter3==1) && (TMath::Abs(vz) < 15))
+		if((HLT_HIL1MinimumBiasHF1AND_v1==1 &&pcollisionEventSelection == 1) && (TMath::Abs(vz) < 15))
+
 		{
 			goodEvent = true;
 		}

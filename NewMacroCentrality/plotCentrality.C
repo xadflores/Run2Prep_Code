@@ -253,6 +253,32 @@ void plotCentrality(TString l1_input)
 	out_data<<"centrality "<<(int)(limit[7])<<"-"<<(int)(limit[8])<<" ="<<EtsumOrig[8]<<"<E_{t} sum <"<<EtsumOrig[7]<<endl;
 	out_data<<"centrality "<<(int)(limit[9])<<"-200 =  E_{t} sum <"<<EtsumOrig[9]<<endl;
 
+
+    out_data<<"0"<<endl;
+    out_data<<(int)(EtsumOrig[9])<<endl;
+    out_data<<(int)(EtsumOrig[7])<<endl;
+    out_data<<(int)(EtsumOrig[5])<<endl;
+    out_data<<(int)(EtsumOrig[3])<<endl;
+    out_data<<(int)(EtsumOrig[1])<<endl;
+    out_data<<(int)(EtsumOrig[1])+1000<<endl;
+    out_data<<(int)(EtsumOrig[1])+2000<<endl;
+    out_data<<endl;
+
+    out_data<<(int)(Etsum[8])<<endl;
+    out_data<<(int)(Etsum[9])<<endl;
+    out_data<<(int)(Etsum[6])<<endl;
+    out_data<<(int)(Etsum[7])<<endl;
+    out_data<<(int)(Etsum[4])<<endl;
+    out_data<<(int)(Etsum[5])<<endl;
+    out_data<<(int)(Etsum[2])<<endl;
+    out_data<<(int)(Etsum[3])<<endl;
+    out_data<<(int)(Etsum[0])<<endl;
+    out_data<<(int)(Etsum[1])<<endl;
+    out_data<<(int)(Etsum[0])+1000<<endl;
+    out_data<<(int)(Etsum[1])+1000<<endl;
+    out_data<<(int)(Etsum[0])+2000<<endl;
+    out_data<<(int)(Etsum[1])+2000<<endl;
+
 	//cout<<isMC<<endl;
 	if(isMC){
 

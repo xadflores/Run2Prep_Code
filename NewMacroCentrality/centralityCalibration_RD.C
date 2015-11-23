@@ -22,16 +22,20 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 	
 	vector<int>     *legacyregion_et;
 	vector<int>     *legacyregion_gctEta;
+	vector<int>     *legacyregion_bx;
     TBranch        *b_legacyregion_et;   //!
     TBranch        *b_legacyregion_gctEta;   //!
+    TBranch        *b_legacyregion_bx;   //!
        
 	legacyregion_et=0;
 	legacyregion_gctEta=0;
+	legacyregion_bx=0;
 	l1Tree->SetBranchAddress("event",&l1_event);
 	l1Tree->SetBranchAddress("run",&l1_run);
 	l1Tree->SetBranchAddress("lumi",&l1_lumi);
     l1Tree->SetBranchAddress("legacyregion_et", &legacyregion_et, &b_legacyregion_et);
     l1Tree->SetBranchAddress("legacyregion_gctEta", &legacyregion_gctEta, &b_legacyregion_gctEta);
+    l1Tree->SetBranchAddress("legacyregion_bx", &legacyregion_bx, &b_legacyregion_bx);
 
 	Int_t f_evt, f_run, f_lumi,f_phfCoincFilter3;
 	Float_t vz;
@@ -106,11 +110,13 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 		int etsum=0;
 		int l1_etsumPlus=0;
 		int l1_etsumMinus=0;
-
-		for (int i=0;i<396;i++){
-                        if (legacyregion_gctEta->at(i)<=3) l1_etsumPlus=l1_etsumPlus+legacyregion_et->at(i);
-                        if (legacyregion_gctEta->at(i)>=18) l1_etsumMinus=l1_etsumMinus+legacyregion_et->at(i);
-
+        
+        int maxsizevector=legacyregion_gctEta->size();
+		for (int i=0;i<maxsizevector; i++){
+		                if(legacyregion_bx->at(i)==0){
+                           if (legacyregion_gctEta->at(i)<=3) l1_etsumPlus=l1_etsumPlus+legacyregion_et->at(i);
+                           if (legacyregion_gctEta->at(i)>=18) l1_etsumMinus=l1_etsumMinus+legacyregion_et->at(i);
+                        }
                 }
 
 
@@ -156,11 +162,13 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 		int etsum=0;
 		int l1_etsumPlus=0;
 		int l1_etsumMinus=0;
-		for (int i=0;i<396;i++){
-                        if (legacyregion_gctEta->at(i)<=3) l1_etsumPlus=l1_etsumPlus+legacyregion_et->at(i);
-                        if (legacyregion_gctEta->at(i)>=18) l1_etsumMinus=l1_etsumMinus+legacyregion_et->at(i);
-
-                }
+        int maxsizevector2=legacyregion_gctEta->size();
+		for (int i=0;i<maxsizevector2; i++){
+		    if(legacyregion_bx->at(i)==0){
+                 if (legacyregion_gctEta->at(i)<=3) l1_etsumPlus=l1_etsumPlus+legacyregion_et->at(i);
+                 if (legacyregion_gctEta->at(i)>=18) l1_etsumMinus=l1_etsumMinus+legacyregion_et->at(i);
+             }
+        }
 
 		etsum=l1_etsumPlus+l1_etsumMinus;
 		//printf("et value %d\n",etsum);

@@ -154,11 +154,12 @@ void centralityCalibrationRD(TString inHiForestFileName, TString outFileName)
 		int etsum=0;
 		int l1_etsumPlus=0;
 		int l1_etsumMinus=0;
-
 		for (int i=0;i<396;i++){
-			if (l1_region_hwEta[i]<=3) l1_etsumPlus=l1_etsumPlus+l1_region_hwPt[i];   
-			if (l1_region_hwEta[i]>=18) l1_etsumMinus=l1_etsumMinus+l1_region_hwPt[i];   
-		}
+                        if (legacyregion_gctEta->at(i)<=3) l1_etsumPlus=l1_etsumPlus+legacyregion_et->at(i);
+                        if (legacyregion_gctEta->at(i)>=18) l1_etsumMinus=l1_etsumMinus+legacyregion_et->at(i);
+
+                }
+
 		etsum=l1_etsumPlus+l1_etsumMinus;
 		//printf("et value %d\n",etsum);
 		//printf("hiBin %d\n",hiBin);

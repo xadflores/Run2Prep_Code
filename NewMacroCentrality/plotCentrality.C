@@ -260,8 +260,8 @@ void plotCentrality(TString l1_input)
     out_data<<(int)(EtsumOrig[5])<<endl;
     out_data<<(int)(EtsumOrig[3])<<endl;
     out_data<<(int)(EtsumOrig[1])<<endl;
-    out_data<<(int)(EtsumOrig[1])+1000<<endl;
-    out_data<<(int)(EtsumOrig[1])+2000<<endl;
+    out_data<<(int)6000<<endl;
+    out_data<<(int)7000<<endl;
     out_data<<endl;
 
     out_data<<(int)(Etsum[8])<<endl;
@@ -274,10 +274,10 @@ void plotCentrality(TString l1_input)
     out_data<<(int)(Etsum[3])<<endl;
     out_data<<(int)(Etsum[0])<<endl;
     out_data<<(int)(Etsum[1])<<endl;
-    out_data<<(int)(Etsum[0])+1000<<endl;
-    out_data<<(int)(Etsum[1])+1000<<endl;
-    out_data<<(int)(Etsum[0])+2000<<endl;
-    out_data<<(int)(Etsum[1])+2000<<endl;
+    out_data<<(int)5900<<endl;
+    out_data<<(int)6100<<endl;
+    out_data<<(int)6900<<endl;
+    out_data<<(int)7100<<endl;
 
 	//cout<<isMC<<endl;
 	if(isMC){

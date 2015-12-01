@@ -41,8 +41,8 @@ void drawText(const char *text, float xp, float yp, int size=24){
 void turnOn(){
  TH1F::SetDefaultSumw2();
  
- //TFile * file = new TFile("/data/velicanu/store/group/phys_heavyions/velicanu/forest/Run2015E/HIExpressPhysics/Merged/HIForestExpress_run262836.root");
- TFile * file = new TFile("/data/velicanu/store/group/phys_heavyions/velicanu/forest/Run2015E/HIExpressPhysics/Merged/HIForestMinbiasUPC_run262548.root");
+ TFile * file = new TFile("/data/velicanu/store/group/phys_heavyions/velicanu/forest/HIRun2015/HIMinimumBias2/Merged/HIMinimumBias_run262816.root");
+ //TFile * file = new TFile("/data/velicanu/store/group/phys_heavyions/velicanu/forest/Run2015E/HIExpressPhysics/Merged/HIForestMinbiasUPC_run262548.root");
 
  TTree * tHlt = (TTree*)file->Get("hltanalysis/HltTree");
  TTree * tHi = (TTree*)file->Get("hiEvtAnalyzer/HiTree");
@@ -52,10 +52,10 @@ void turnOn(){
  tHlt->AddFriend(skim);
  
  
- //int nTrig = 8;
-// TString trigNames[]={ "L1_MinimumBiasHF1_AND","L1_MinimumBiasHF2_AND","L1_HFplusANDminusTH0","L1_Centrality_ext0_100_MinimumumBiasHF1_AND", "L1_Centrality_ext0_5_MinimumumBiasHF1_AND", "L1_Centrality_ext0_10_MinimumumBiasHF1_AND", "L1_Centrality_ext30_50_MinimumumBiasHF1_AND", "L1_Centrality_ext50_100_MinimumumBiasHF1_AND"};
-  int nTrig = 7;
- TString trigNames[]={ "L1_HFplusANDminusTH0","L1_Centrality_ext0_100_HFplusANDminusTH0", "L1_Centrality_ext0_5_HFplusANDminusTH0", "L1_Centrality_ext0_10_HFplusANDminusTH0", "L1_Centrality_ext30_50_HFplusANDminusTH0", "L1_Centrality_ext30_100_HFplusANDminusTH0", "L1_Centrality_ext50_100_HFplusANDminusTH0"};
+  int nTrig = 8;
+  TString trigNames[]={ "L1_MinimumBiasHF1_AND","L1_MinimumBiasHF2_AND","L1_HFplusANDminusTH0","L1_Centrality_ext0_100_MinimumumBiasHF1_AND", "L1_Centrality_ext0_5_MinimumumBiasHF1_AND", "L1_Centrality_ext0_10_MinimumumBiasHF1_AND", "L1_Centrality_ext30_50_MinimumumBiasHF1_AND", "L1_Centrality_ext50_100_MinimumumBiasHF1_AND"};
+  //int nTrig = 7;
+ //TString trigNames[]={ "L1_HFplusANDminusTH0","L1_Centrality_ext0_100_HFplusANDminusTH0", "L1_Centrality_ext0_5_HFplusANDminusTH0", "L1_Centrality_ext0_10_HFplusANDminusTH0", "L1_Centrality_ext30_50_HFplusANDminusTH0", "L1_Centrality_ext30_100_HFplusANDminusTH0", "L1_Centrality_ext50_100_HFplusANDminusTH0"};
  const int nthresholds=4;
  const int threshold[nthresholds]={10,20,60,100};
  const int color[nthresholds]={1,2,4,7};
@@ -64,6 +64,7 @@ void turnOn(){
  TGraphAsymmErrors *hTurnOn[nTrig-1];
  for(int iTrig = 0; iTrig < nTrig; iTrig++){
   hHi[iTrig] = new TH1F(Form("hHi%d",iTrig),";hiBin;Trig turn on",201,-0.5,200.5);
+  //tHlt->Draw(Form("hiBin>>hHi%d",iTrig),Form("%s && L1_MinimumBiasHF1_AND && HLT_HIL1MinimumBiasHF1AND_v1 && pcollisionEventSelection",trigNames[iTrig].Data()));
   tHlt->Draw(Form("hiBin>>hHi%d",iTrig),Form("%s && L1_MinimumBiasHF1_AND && HLT_HIL1MinimumBiasHF1AND_v1 && pcollisionEventSelection",trigNames[iTrig].Data()));
  }
  
@@ -102,5 +103,6 @@ void turnOn(){
   line[1]->Draw();
   line[2]->Draw();
   line[3]->Draw();
+  c1[iTrig-1] ->SaveAs(Form("TurnOn/canvas_%d.pdf",iTrig));
  }
 }

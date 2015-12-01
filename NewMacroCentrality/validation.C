@@ -3,7 +3,7 @@
 
 void validation(){
   const Int_t COLORS[NBINSCentrality] = {kViolet+1,kRed+1,kBlue+1,kGreen+1,1,30};
-  TFile *inFile = new TFile("/data/velicanu/store/group/phys_heavyions/velicanu/forest/Run2015E/HIExpressPhysics/Merged/HiForest_Streamer_run262315.root");
+  TFile *inFile = new TFile("/data/velicanu/store/group/phys_heavyions/velicanu/forest/Run2015E/HIExpressPhysics/Merged/HIForestMinbiasUPC_run262548.root");
   TTree *hltTree = (TTree*)inFile->Get("hltanalysis/HltTree");
   TTree *fEvtTree = (TTree*)inFile->Get("hiEvtAnalyzer/HiTree");
   TTree *fSkimTree = (TTree*)inFile->Get("skimanalysis/HltTree");
@@ -24,6 +24,7 @@ void validation(){
   Int_t L1_Centrality_ext30_50_HFplusANDminusTH0;  
   Int_t L1_Centrality_ext50_100_HFplusANDminusTH0; 
   Int_t L1_Centrality_ext70_100_HFplusANDminusTH0; 
+  Int_t HLT_HIL1MinimumBiasHF1AND_v1;
  
   L1_Centrality_ext0_100_HFplusANDminusTH0=0;
   L1_Centrality_ext0_10_HFplusANDminusTH0=0;
@@ -31,9 +32,8 @@ void validation(){
   L1_Centrality_ext30_50_HFplusANDminusTH0=0; 
   L1_Centrality_ext50_100_HFplusANDminusTH0=0;
   L1_Centrality_ext70_100_HFplusANDminusTH0=0;
+  HLT_HIL1MinimumBiasHF1AND_v1=0;
 
- 
- 
   fEvtTree->SetBranchAddress("evt",&f_evt);
   fEvtTree->SetBranchAddress("run",&f_run);
   fEvtTree->SetBranchAddress("lumi",&f_lumi);
@@ -47,11 +47,12 @@ void validation(){
   hltTree->SetBranchAddress("L1_Centrality_ext30_50_HFplusANDminusTH0",&L1_Centrality_ext30_50_HFplusANDminusTH0);
   hltTree->SetBranchAddress("L1_Centrality_ext50_100_HFplusANDminusTH0",&L1_Centrality_ext50_100_HFplusANDminusTH0);
   hltTree->SetBranchAddress("L1_Centrality_ext70_100_HFplusANDminusTH0",&L1_Centrality_ext70_100_HFplusANDminusTH0);
+  hltTree->SetBranchAddress("HLT_HIL1MinimumBiasHF1AND_v1",&HLT_HIL1MinimumBiasHF1AND_v1);
 
   int entries = 0;     
   entries = fEvtTree->GetEntries();
 
-  for(Long64_t j = 0; j < entries; ++j)
+  for(Long64_t j = 0; j < 1e5; ++j)
   {
     // Only use good collision events ********
     fEvtTree->GetEntry(j);
@@ -59,6 +60,7 @@ void validation(){
     hltTree->GetEntry(j);
 
 
+    if(!HLT_HIL1MinimumBiasHF1AND_v1) continue;
     if(L1_Centrality_ext0_100_HFplusANDminusTH0) {hOffline[0]->Fill(hiBin);}
     if(L1_Centrality_ext0_10_HFplusANDminusTH0==1){hOffline[1]->Fill(hiBin);}
     if(L1_Centrality_ext30_50_HFplusANDminusTH0==1){hOffline[2]->Fill(hiBin);}
@@ -72,7 +74,7 @@ void validation(){
   TCanvas *canvasranges=new TCanvas("canvasranges","canvasranges",600,500);
   canvasranges->cd();
 
-  hOffline[0]->SetMaximum(500);
+  hOffline[0]->SetMaximum(100000);
   hOffline[0]->GetXaxis()->SetRangeUser(-10,210.);
   hOffline[0]->GetYaxis()->SetTitleOffset(1.5);
 
@@ -124,5 +126,12 @@ line20->Draw();
 line60->Draw();
 line100->Draw();
 line140->Draw();
+
+TFile *filevalidation=new TFile("filevalidation.root","recreate");
+filevalidation->cd();
+for(int j=0;j<NBINSCentrality;j++){
+  hOffline[j]->Write();
+}
+
 
 }	

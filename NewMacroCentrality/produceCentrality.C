@@ -99,7 +99,7 @@ void produceCentrality()
   
   h->Draw();
   
-  TLegend *leg=new TLegend(0.4580537,0.7097902,0.7550336,0.8846154,"");
+  TLegend *leg=new TLegend(0.4815436,0.1975524,0.8825503,0.4090909,"");
   leg->SetBorderSize(0);
   leg->SetLineColor(0);
   leg->SetFillColor(0);
@@ -133,5 +133,6 @@ void produceCentrality()
 
   CMS_lumi( canv, 1, 11 );
   canv->SaveAs("TRDFigure_Centrality.pdf");
+  canv->SaveAs("TRDFigure_Centrality.png");
 
 }

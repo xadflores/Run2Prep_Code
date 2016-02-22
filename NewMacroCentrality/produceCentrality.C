@@ -70,10 +70,10 @@ void produceCentrality()
    cout<<"meanprescale="<<meanprescale[i]<<endl;
    }
    
-   const int nBin = 40;
+   const int nBin = 100;
    Float_t bins[nBin+1];
    for (int myindex=0; myindex<=nBin; myindex++) {
-     bins[myindex]=(double)myindex*5;
+     bins[myindex]=(double)myindex*2;
      cout<<bins[myindex]<<endl;
    }
    // Templates for plotting  
@@ -81,8 +81,10 @@ void produceCentrality()
    TH1D *hTmp2 = new TH1D ("hTmp2","",100,0,100);
    
    TGraphAsymmErrors* gEfficiency[NThresholds];
+   TGraphAsymmErrors* gEfficiencyCloned[NThresholds];
    for (int i=0;i<NThresholds;i++){
      gEfficiency[i]=getEfficiency(tHlt,"hiBin/2",baseline.Data(),cut[i].Data(),nBin, bins,meanprescale[i]);
+     gEfficiencyCloned[i]=getEfficiency(tHlt,"hiBin/2",baseline.Data(),cut[i].Data(),nBin, bins,meanprescale[i]);
      line[i]=new TLine(L1_THRESHOLD[i],0.,L1_THRESHOLD[i],1.2);
 	 line[i]->SetLineWidth(2);
 	 line[i]->SetLineStyle(2);
@@ -97,7 +99,7 @@ void produceCentrality()
 
   // references for T, B, L, R
   float T = 0.08*H_ref;
-  float B = 0.12*H_ref; 
+  float B = 0.14*H_ref; 
   float L = 0.14*W_ref;
   float R = 0.08*W_ref;
 
@@ -117,7 +119,25 @@ void produceCentrality()
   h->GetXaxis()->SetTitle("Offline centrality (%)");  
   h->GetYaxis()->SetNdivisions(6,5,0);
   h->GetYaxis()->SetTitleOffset(1);
-  h->GetYaxis()->SetTitle("L1 trigger efficiency");  
+  h->GetYaxis()->SetTitle("Efficiency");  
+  
+  
+    h->GetYaxis()->SetTitleOffset(1.1);
+    h->GetXaxis()->SetTitleOffset(0.95);
+    h->GetYaxis()->SetTitle("Efficiency");  
+    h->GetYaxis()->CenterTitle();
+    h->GetXaxis()->CenterTitle();
+    h->SetMaximum(1.4);
+    h->GetXaxis()->SetTitleFont(42);
+    h->GetXaxis()->SetLabelFont(42);
+    h->GetXaxis()->SetTitleSize(0.06);
+    h->GetXaxis()->SetLabelSize(0.05);
+    h->GetYaxis()->SetTitleFont(42);
+    h->GetYaxis()->SetLabelFont(42);
+    h->GetYaxis()->SetTitleSize(0.06);
+    h->GetYaxis()->SetLabelSize(0.05);
+
+  
   h->SetMaximum(2.);
   
   
@@ -133,7 +153,7 @@ void produceCentrality()
   
 	for(int i = 0; i < NThresholds; i++){
 		leg->AddEntry(gEfficiency[i],Form("L1 centrality (%%) >%d ",(int)L1_THRESHOLD[i]),"lp");
-		line[i]->Draw();
+		//line[i]->Draw();
 	}
 
   
@@ -144,9 +164,40 @@ void produceCentrality()
     gEfficiency[i]->SetMarkerStyle(20);
     gEfficiency[i]->SetMarkerColor(COLORS[i]);
     gEfficiency[i]->SetLineStyle(1);
-    gEfficiency[i]->Draw("epsame");
+    gEfficiency[i]->Draw("lepsame");
   
-  }
+    gEfficiencyCloned[i]->SetLineColor(COLORS[i]);
+    gEfficiencyCloned[i]->SetLineWidth(2);
+    gEfficiencyCloned[i]->SetMarkerStyle(20);
+    gEfficiencyCloned[i]->SetMarkerColor(COLORS[i]);
+    gEfficiencyCloned[i]->SetLineStyle(1);
+
+  }  
+  
+  
+    for (int m=0; m<gEfficiencyCloned[0]->GetN();m++){
+    double x,y;
+    gEfficiencyCloned[0]->GetPoint(m,x,y);
+    if(y>0) gEfficiencyCloned[0]->SetPoint(m,x,10000);
+    }  
+    
+    for (int m=0; m<gEfficiencyCloned[1]->GetN();m++){
+    double x,y;
+    gEfficiencyCloned[1]->GetPoint(m,x,y);
+    if(y>0) gEfficiencyCloned[1]->SetPoint(m,x,10000);
+    }  
+
+    for (int m=0; m<gEfficiencyCloned[2]->GetN();m++){
+    double x,y;
+    gEfficiencyCloned[2]->GetPoint(m,x,y);
+    if(y>0) gEfficiencyCloned[2]->SetPoint(m,x,10000);
+    }  
+    
+    gEfficiencyCloned[2]->Draw("epsame");
+    gEfficiencyCloned[1]->Draw("epsame");
+    gEfficiencyCloned[0]->Draw("epsame");
+
+  
   leg->Draw();
   
   writeExtraText = true;       // if extra text
@@ -158,5 +209,7 @@ void produceCentrality()
   CMS_lumi( canv, 1, 11 );
   canv->SaveAs("TRDFigure_Centrality.pdf");
   canv->SaveAs("TRDFigure_Centrality.png");
+  canv->SaveAs("TRDFigure_Centrality.C");
+  
 
 }

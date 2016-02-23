@@ -124,7 +124,7 @@ void produceCentrality()
   
     h->GetYaxis()->SetTitleOffset(1.1);
     h->GetXaxis()->SetTitleOffset(0.95);
-    h->GetYaxis()->SetTitle("Efficiency");  
+    h->GetYaxis()->SetTitle("L1 Efficiency");  
     h->GetYaxis()->CenterTitle();
     h->GetXaxis()->CenterTitle();
     h->SetMaximum(1.4);
@@ -209,6 +209,8 @@ void produceCentrality()
   CMS_lumi( canv, 1, 11 );
   canv->SaveAs("TRDFigure_Centrality.pdf");
   canv->SaveAs("TRDFigure_Centrality.png");
+  canv->SaveAs("TRDFigure_Centrality.jpeg");
+  canv->SaveAs("TRDFigure_Centrality.eps");
   canv->SaveAs("TRDFigure_Centrality.C");
   
 
